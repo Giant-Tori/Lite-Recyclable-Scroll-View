@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Tori.UI.R_ScrollView
 {
-    public class TestSlot : Slot
+    public class TestSlot : MonoBehaviour
     {
         [SerializeField] private TMP_Text _text;
 

@@ -1,26 +1,24 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Tori.UI.R_ScrollView
 {
     public class RecyclableScrollRect : ScrollRect
     {
-        private List<Slot> _slots = new List<Slot>(); 
+        private List<Action> _makeSlotActions = new List<Action>();
 
         protected override void Awake()
         {
             base.Awake();
         }
 
-        public void Refresh(List<Slot> slots)
+        public void Refresh()
         {
-            _slots = slots;
 
-            // For Test
-            for (int i = 0; i < _slots.Count; i++)
-            {
-                _slots[i].MakeSlot();
-            }
+
+            
         }
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,18 +19,13 @@ namespace Tori.UI.R_ScrollView
         }
         public void OnClick()
         {
-            var slots = new List<Slot>();
+
             for (int i = 0; i < 100; i++)
             {
-                var slot = Instantiate(_slotPrefab, _slotParent);
-                var index = i;
-                slot.SetMakeSlotActions(new List<System.Action>
-                {
-                    () => slot.SetText(index.ToString())
-                });
-                slots.Add(slot);
+                int index = i;
+
+
             }
-            _scrollRect.Refresh(slots);
         }
     }
 }
