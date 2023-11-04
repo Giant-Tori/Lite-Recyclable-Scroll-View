@@ -19,12 +19,21 @@ namespace Tori.UI.R_ScrollView
         }
         public void OnClick()
         {
-
+            List<TestSlotInfo> slots = new List<TestSlotInfo>();
             for (int i = 0; i < 100; i++)
             {
                 int index = i;
+                var info = new TestSlotInfo()
+                {
+                    text = $"Slot {index}"
+                };
+                slots.Add(info);
 
-
+            }
+            foreach(var slot in slots)
+            {
+                var s = Instantiate(_slotPrefab, _slotParent);
+                s.MakeSlot(slot);
             }
         }
     }

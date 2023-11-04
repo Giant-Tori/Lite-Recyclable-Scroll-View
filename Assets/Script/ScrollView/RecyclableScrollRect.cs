@@ -7,7 +7,6 @@ namespace Tori.UI.R_ScrollView
 {
     public class RecyclableScrollRect : ScrollRect
     {
-        private List<Action> _makeSlotActions = new List<Action>();
 
         protected override void Awake()
         {
@@ -16,7 +15,6 @@ namespace Tori.UI.R_ScrollView
 
         public void Refresh()
         {
-
 
             
         }
