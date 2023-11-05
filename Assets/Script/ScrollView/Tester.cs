@@ -13,13 +13,14 @@ namespace Tori.UI.R_ScrollView
         [SerializeField] private Button _button;
         [SerializeField] private Transform _slotParent;
 
+        private List<SlotInfo> _slotInfos = new List<SlotInfo>();
         private void Awake()
         {
             _button.onClick.AddListener(OnClick);
         }
         public void OnClick()
         {
-            List<TestSlotInfo> slots = new List<TestSlotInfo>();
+            List<SlotInfo> slots = new List<SlotInfo>();
             for (int i = 0; i < 100; i++)
             {
                 int index = i;
@@ -30,11 +31,14 @@ namespace Tori.UI.R_ScrollView
                 slots.Add(info);
 
             }
-            foreach(var slot in slots)
-            {
-                var s = Instantiate(_slotPrefab, _slotParent);
-                s.MakeSlot(slot);
-            }
+            _slotInfos = slots;
+
+            _scrollRect.Refresh(slots);
+        }
+        public void MakeSlot(ISlot slot, int index)
+        {
+            var slotObj = slot as TestSlot;
+            slotObj.MakeSlot(_slotInfos[index]);
         }
     }
 }
