@@ -13,6 +13,8 @@ namespace Tori.UI
         [SerializeField] private Transform _content;
         [SerializeField] private int _slotCount;
 
+        private TestSlot _slot;
+
         private void Awake()
         {
             _button.onClick.AddListener(OnClick);

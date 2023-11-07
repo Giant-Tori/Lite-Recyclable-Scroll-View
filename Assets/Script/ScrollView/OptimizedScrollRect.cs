@@ -7,18 +7,17 @@ namespace Tori.UI
     {
         [SerializeField] private GameObject _slotPrefab;
 
-        private int _slotCount;
-        private float _sloHeight;
-
         private Rect _viewportRect;
-        private int _buffer = 4;
-        private int _childIndex = 0;
-        private bool _isChanging = false;
-
         private Vector2 _prePosition;
 
-        private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _sloHeight) + _buffer;
-        private float _verticalSlotNormalizedHeight => 1f / (float)_verticalSlotCount;
+        private int _slotCount;
+        private float _slotHeight;
+
+        private int _currentStartIndex = 0;
+        private float _epsilon = 0.01f; // for float comparison
+
+        private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _slotHeight) + 2;
+       
         protected override void Awake()
         {
             onValueChanged.RemoveAllListeners();
@@ -33,72 +32,17 @@ namespace Tori.UI
             Refresh();
 
         }
-
-        public void OnValueChanged(Vector2 normalizedPosition)
-        {
-            if (_isChanging)
-            {
-                return;
-            }
-            _isChanging = true;
-            m_ContentStartPosition += GetDirection(normalizedPosition);
-            _prePosition = content.anchoredPosition;
-            _isChanging = false;
-        }
-        private Vector2 GetDirection(Vector2 normalizedPosition)
-        {
-            Vector2 result = Vector2.zero;
-
-            var direction = content.anchoredPosition.y - _prePosition.y;
-            var preVelocity = velocity;
-            if (normalizedPosition.y < _verticalSlotNormalizedHeight && direction > 0f)
-            {
-
-                var index = _childIndex + _verticalSlotCount + 1;
-                if (index >= _slotCount)
-                {
-                    return result;
-                }
-                if (_childIndex > 0)
-                {
-                    content.transform.GetChild(_childIndex - 1).gameObject.SetActive(false);
-                }
-                _childIndex++;
-                content.transform.GetChild(index).gameObject.SetActive(true);
-                result = new Vector2(0f, _verticalSlotNormalizedHeight);
-            }
-            else if (normalizedPosition.y > 1f - _verticalSlotNormalizedHeight && direction < 0f)
-            {
-                var index = _childIndex - 1;
-                if (index < _slotCount)
-                {
-                    return result;
-                }
-                if (_childIndex < _slotCount - 1)
-                {
-                    content.transform.GetChild(_childIndex + 1).gameObject.SetActive(false);
-                }
-                _childIndex--;
-
-                content.transform.GetChild(index).gameObject.SetActive(true);
-                result = new Vector2(0f, -_verticalSlotNormalizedHeight);
-            }
-
-            return result;
-        }
-
         public void Refresh()
         {
             if (!TryInit())
             {
                 return;
             }
-            Debug.Log($"verticalSlotCount: {_verticalSlotCount}, {content.childCount}");
 
-            _childIndex = 0;
-            _prePosition = new Vector2(0f, 1f);
+            _currentStartIndex = 0;
+            _prePosition = new Vector2(0f, 0f);
 
-            var childCount = content.childCount;
+            var childCount = content.transform.childCount;
             for (int i = 0; i < childCount; i++)
             {
                 if (i < _verticalSlotCount)
@@ -113,6 +57,43 @@ namespace Tori.UI
 
         }
 
+        private void OnValueChanged(Vector2 normalizedPosition)
+        {
+            var current = content.anchoredPosition;
+            var diff = current.y - _prePosition.y;
+
+            if (diff >= _slotHeight - _epsilon)
+            {
+                if (_currentStartIndex + _verticalSlotCount >= _slotCount)
+                {
+                    return;
+                }
+                SetSlotActive(_currentStartIndex, false);
+                SetSlotActive(_currentStartIndex + _verticalSlotCount, true);
+                _currentStartIndex++;
+
+                content.anchoredPosition -= new Vector2(0, _slotHeight);
+                _prePosition = content.anchoredPosition;
+
+            }
+            else if (-diff >= _slotHeight - _epsilon)
+            {
+                if (_currentStartIndex <= 0)
+                {
+                    return;
+                }
+                SetSlotActive(_currentStartIndex + _verticalSlotCount - 1, false);
+                SetSlotActive(_currentStartIndex - 1, true);
+                _currentStartIndex--;
+
+                content.anchoredPosition += new Vector2(0, _slotHeight);
+                _prePosition = content.anchoredPosition;
+            }
+        }
+
+
+        
+        //Get slot prefab height and slot count
         private bool TryInit()
         {
             _slotCount = content.transform.childCount;
@@ -123,9 +104,14 @@ namespace Tori.UI
                 return false;
             }
 
-            _sloHeight = slotRect.rect.height;
+            _slotHeight = slotRect.rect.height;
 
             return true;
+        }
+
+        private void SetSlotActive(int index, bool isActive)
+        {
+            content.GetChild(index).gameObject.SetActive(isActive);
         }
     }
 }
