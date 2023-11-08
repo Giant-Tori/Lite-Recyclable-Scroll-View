@@ -29,10 +29,11 @@ namespace Tori.UI
         AnimBool m_ShowDecelerationRate;
 
         OptimizedScrollRect _script;
+        private bool _isHorizontal = false;
+
         protected virtual void OnEnable()
         {
             _script = (OptimizedScrollRect)target;
-
             m_Content = serializedObject.FindProperty("m_Content");
             m_Horizontal = serializedObject.FindProperty("m_Horizontal");
             m_Vertical = serializedObject.FindProperty("m_Vertical");
@@ -50,6 +51,17 @@ namespace Tori.UI
             m_ShowElasticity = new AnimBool(Repaint);
             m_ShowDecelerationRate = new AnimBool(Repaint);
             SetAnimBools(true);
+
+            if(m_Horizontal.boolValue)
+            {
+                _isHorizontal = true;
+            }
+            else
+            {
+                _isHorizontal = false;
+            }
+
+
         }
 
         protected virtual void OnDisable()
@@ -76,7 +88,18 @@ namespace Tori.UI
         {
             SetAnimBools(false);
             serializedObject.Update();
-         
+
+            if (_isHorizontal)
+            {
+                m_Horizontal.boolValue = true;
+                m_Vertical.boolValue = false;
+            }
+            else
+            {
+                m_Horizontal.boolValue = false;
+                m_Vertical.boolValue = true;
+            }
+
             EditorGUILayout.PropertyField(m_Viewport);
             EditorGUILayout.PropertyField(m_Content);
             EditorGUILayout.PropertyField(m_Horizontal);
@@ -107,6 +130,18 @@ namespace Tori.UI
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(m_OnValueChanged);
+
+            if(m_Horizontal.boolValue != _isHorizontal)
+            {
+                m_Vertical.boolValue = !m_Horizontal.boolValue;
+                _isHorizontal = m_Horizontal.boolValue;
+            }
+            else if(m_Vertical.boolValue != !_isHorizontal)
+            {
+                m_Horizontal.boolValue = !m_Vertical.boolValue;
+                _isHorizontal = !m_Vertical.boolValue;
+            }
+
 
             serializedObject.ApplyModifiedProperties();
         }

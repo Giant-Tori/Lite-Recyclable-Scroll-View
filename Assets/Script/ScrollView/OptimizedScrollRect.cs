@@ -12,25 +12,34 @@ namespace Tori.UI
 
         private int _slotCount;
         private float _slotHeight;
+        private float _slotWidth;
 
         private int _currentStartIndex = 0;
         private float _epsilon = 0.01f; // for float comparison
 
         private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _slotHeight) + 2;
-       
-        protected override void Awake()
-        {
-            onValueChanged.RemoveAllListeners();
-            onValueChanged.AddListener(OnValueChanged);
-
-            _viewportRect = viewport.rect;
-        }
+        private int _horizontalSlotCount => Mathf.CeilToInt(_viewportRect.width / _slotWidth) + 2;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            Refresh();
+            _viewportRect = viewport.rect;
 
+            if (horizontal)
+            {
+                onValueChanged.AddListener(OnValueChangedHorizontal);
+            }
+            else
+            {
+                onValueChanged.AddListener(OnValueChangedVertical);
+            }
+
+            Refresh();
+        }
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            onValueChanged.RemoveAllListeners();
         }
         public void Refresh()
         {
@@ -39,13 +48,19 @@ namespace Tori.UI
                 return;
             }
 
+            // Reset Data
             _currentStartIndex = 0;
             _prePosition = new Vector2(0f, 0f);
 
+            // Set Slot Active
             var childCount = content.transform.childCount;
             for (int i = 0; i < childCount; i++)
             {
-                if (i < _verticalSlotCount)
+                if (vertical && i < _verticalSlotCount)
+                {
+                    content.GetChild(i).gameObject.SetActive(true);
+                }
+                else if (horizontal && i < _horizontalSlotCount)
                 {
                     content.GetChild(i).gameObject.SetActive(true);
                 }
@@ -57,42 +72,93 @@ namespace Tori.UI
 
         }
 
-        private void OnValueChanged(Vector2 normalizedPosition)
+        private void OnValueChangedVertical(Vector2 normalizedPosition)
         {
             var current = content.anchoredPosition;
             var diff = current.y - _prePosition.y;
+            var isDown = diff >= _slotHeight - _epsilon;
+            var isUp = -diff >= _slotHeight - _epsilon;
 
-            if (diff >= _slotHeight - _epsilon)
+            if (isDown)
             {
-                if (_currentStartIndex + _verticalSlotCount >= _slotCount)
+                var isLast = _currentStartIndex + _verticalSlotCount >= _slotCount;
+                if (isLast)
                 {
                     return;
                 }
+                // Move content
+                content.anchoredPosition -= new Vector2(0, _slotHeight);
+                _prePosition = content.anchoredPosition;
+
+                // Set slot active
                 SetSlotActive(_currentStartIndex, false);
                 SetSlotActive(_currentStartIndex + _verticalSlotCount, true);
                 _currentStartIndex++;
 
-                content.anchoredPosition -= new Vector2(0, _slotHeight);
-                _prePosition = content.anchoredPosition;
 
             }
-            else if (-diff >= _slotHeight - _epsilon)
+            else if (isUp)
             {
                 if (_currentStartIndex <= 0)
                 {
                     return;
                 }
+                // Move content
+                content.anchoredPosition += new Vector2(0, _slotHeight);
+                _prePosition = content.anchoredPosition;
+
+                // Set slot active
                 SetSlotActive(_currentStartIndex + _verticalSlotCount - 1, false);
                 SetSlotActive(_currentStartIndex - 1, true);
                 _currentStartIndex--;
 
-                content.anchoredPosition += new Vector2(0, _slotHeight);
+            }
+        }
+
+        private void OnValueChangedHorizontal(Vector2 normalizedPosition)
+        {
+            var current = content.anchoredPosition;
+            var diff = current.x - _prePosition.x;
+            var isRight = -diff >= _slotWidth - _epsilon;
+            var isLeft = diff >= _slotWidth - _epsilon;
+
+            if (isRight)
+            {
+                var isLast = _currentStartIndex + _horizontalSlotCount >= _slotCount;
+                if (isLast)
+                {
+                    return;
+                }
+                // Move content
+                content.anchoredPosition += new Vector2(_slotWidth, 0);
                 _prePosition = content.anchoredPosition;
+
+                // Set slot active
+                SetSlotActive(_currentStartIndex, false);
+                SetSlotActive(_currentStartIndex + _horizontalSlotCount, true);
+                _currentStartIndex++;
+
+
+            }
+            else if (isLeft)
+            {
+                if (_currentStartIndex <= 0)
+                {
+                    return;
+                }
+                // Move content
+                content.anchoredPosition -= new Vector2(_slotWidth, 0);
+                _prePosition = content.anchoredPosition;
+
+                // Set slot active
+                SetSlotActive(_currentStartIndex + _horizontalSlotCount - 1, false);
+                SetSlotActive(_currentStartIndex - 1, true);
+                _currentStartIndex--;
+
             }
         }
 
 
-        
         //Get slot prefab height and slot count
         private bool TryInit()
         {
@@ -105,6 +171,7 @@ namespace Tori.UI
             }
 
             _slotHeight = slotRect.rect.height;
+            _slotWidth = slotRect.rect.width;
 
             return true;
         }
