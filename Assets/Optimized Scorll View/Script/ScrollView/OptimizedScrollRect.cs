@@ -16,9 +16,10 @@ namespace Tori.UI
 
         private int _currentStartIndex = 0;
         private float _epsilon = 0.01f; // for float comparison
+        private int _buffer = 2; // buffer for slot count
 
-        private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _slotHeight) + 2;
-        private int _horizontalSlotCount => Mathf.CeilToInt(_viewportRect.width / _slotWidth) + 2;
+        private int _verticalSlotCount =>Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer;
+        private int _horizontalSlotCount =>Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer;
 
         protected override void OnEnable()
         {
