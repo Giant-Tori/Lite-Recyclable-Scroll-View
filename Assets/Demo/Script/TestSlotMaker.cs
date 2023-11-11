@@ -7,13 +7,12 @@ namespace Tori.UI
 {
     public class TestSlotMaker : MonoBehaviour
     {
-        [SerializeField] private OptimizedScrollRect _scrollRect;
         [SerializeField] private Button _button;
-        [SerializeField] private TestSlot _slotPrefab;
-        [SerializeField] private Transform _content;
+        [SerializeField] private GameObject _slotPrefab;
+        [SerializeField] private Transform[] _contents;
         [SerializeField] private int _slotCount;
-
-        private TestSlot _slot;
+        [SerializeField] private OptimizedScrollRect _verticalScrollRect;
+        [SerializeField] private OptimizedScrollRect _horizontalScrollRect;
 
         private void Awake()
         {
@@ -21,13 +20,15 @@ namespace Tori.UI
         }
         private void OnClick()
         {
-            for (int i = 0; i < _slotCount; i++)
+            for(int i = 0; i < 3; i++)
             {
-                var slot = Instantiate(_slotPrefab, _content);
-                var name = $"Slot {i}";
-                slot.SetText(name);
+                for (int j= 0; j < _slotCount; j++)
+                {
+                    var slot = Instantiate(_slotPrefab, _contents[i]);
+                }
             }
-            _scrollRect.Refresh();
+            _verticalScrollRect.Refresh();
+            _horizontalScrollRect.Refresh();
         }
     }
 }

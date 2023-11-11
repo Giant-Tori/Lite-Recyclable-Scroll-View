@@ -6,6 +6,7 @@ namespace Tori.UI
     public class OptimizedScrollRect : ScrollRect
     {
         [SerializeField] private GameObject _slotPrefab;
+        [SerializeField] private GridLayoutGroup _gridLayoutGroup;
 
         private Rect _viewportRect;
         private Vector2 _prePosition;
@@ -18,11 +19,16 @@ namespace Tori.UI
         private float _epsilon = 0.01f; // for float comparison
         private int _buffer = 2; // buffer for slot count
 
-        private int _verticalSlotCount =>Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer;
-        private int _horizontalSlotCount =>Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer;
+        private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer;
+        private int _horizontalSlotCount => Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer;
 
         protected override void OnEnable()
         {
+            if(Application.isPlaying == false)
+            {
+                return;
+            }
+
             base.OnEnable();
             _viewportRect = viewport.rect;
 
@@ -32,6 +38,7 @@ namespace Tori.UI
             }
             else
             {
+
                 onValueChanged.AddListener(OnValueChangedVertical);
             }
 
@@ -60,6 +67,7 @@ namespace Tori.UI
                 if (vertical && i < _verticalSlotCount)
                 {
                     content.GetChild(i).gameObject.SetActive(true);
+
                 }
                 else if (horizontal && i < _horizontalSlotCount)
                 {
@@ -75,6 +83,7 @@ namespace Tori.UI
 
         private void OnValueChangedVertical(Vector2 normalizedPosition)
         {
+
             var current = content.anchoredPosition;
             var diff = current.y - _prePosition.y;
             var isDown = diff >= _slotHeight - _epsilon;
@@ -82,11 +91,13 @@ namespace Tori.UI
 
             if (isDown)
             {
+
                 var isLast = _currentStartIndex + _verticalSlotCount >= _slotCount;
                 if (isLast)
                 {
                     return;
                 }
+
                 // Move content
                 content.anchoredPosition -= new Vector2(0, _slotHeight);
                 _prePosition = content.anchoredPosition;
@@ -104,6 +115,7 @@ namespace Tori.UI
                 {
                     return;
                 }
+
                 // Move content
                 content.anchoredPosition += new Vector2(0, _slotHeight);
                 _prePosition = content.anchoredPosition;
@@ -170,9 +182,16 @@ namespace Tori.UI
                 Debug.LogError("Failed to get RectTransform from slotPrefab");
                 return false;
             }
-
-            _slotHeight = slotRect.rect.height;
-            _slotWidth = slotRect.rect.width;
+            if(content.TryGetComponent<GridLayoutGroup>(out var gridLayout))
+            {
+                _slotHeight = gridLayout.cellSize.y;
+                _slotWidth = gridLayout.cellSize.x;
+            }
+            else
+            {
+                _slotHeight = slotRect.rect.height;
+                _slotWidth = slotRect.rect.width;
+            }
 
             return true;
         }
