@@ -56,6 +56,8 @@ namespace Tori.UI
                 return;
             }
 
+            SetContentSIze();
+
             // Reset Data
             _currentStartIndex = 0;
             _prePosition = new Vector2(0f, 0f);
@@ -182,6 +184,7 @@ namespace Tori.UI
                 Debug.LogError("Failed to get RectTransform from slotPrefab");
                 return false;
             }
+
             if(content.TryGetComponent<GridLayoutGroup>(out var gridLayout))
             {
                 _slotHeight = gridLayout.cellSize.y;
@@ -200,5 +203,22 @@ namespace Tori.UI
         {
             content.GetChild(index).gameObject.SetActive(isActive);
         }
+
+        private void SetContentSIze()
+        {
+            var size = content.sizeDelta;
+            if (vertical)
+            {
+                size.x = _slotWidth;
+                size.y = _slotHeight * _verticalSlotCount;
+            }
+            else
+            {
+                size.x = _slotWidth * _horizontalSlotCount;
+                size.y = _slotHeight;
+            }
+            content.sizeDelta = size;
+        }
+
     }
 }
