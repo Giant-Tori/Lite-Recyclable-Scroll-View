@@ -24,7 +24,7 @@ namespace Tori.UI
 
         protected override void OnEnable()
         {
-            if(Application.isPlaying == false)
+            if (Application.isPlaying == false)
             {
                 return;
             }
@@ -81,6 +81,9 @@ namespace Tori.UI
                 }
             }
 
+            SetSlotPosition(_currentStartIndex);
+
+
         }
 
         private void OnValueChangedVertical(Vector2 normalizedPosition)
@@ -109,6 +112,8 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex + _verticalSlotCount, true);
                 _currentStartIndex++;
 
+                SetSlotPosition(_currentStartIndex);
+
 
             }
             else if (isUp)
@@ -127,6 +132,7 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex - 1, true);
                 _currentStartIndex--;
 
+                SetSlotPosition(_currentStartIndex);
             }
         }
 
@@ -185,7 +191,7 @@ namespace Tori.UI
                 return false;
             }
 
-            if(content.TryGetComponent<GridLayoutGroup>(out var gridLayout))
+            if (content.TryGetComponent<GridLayoutGroup>(out var gridLayout))
             {
                 _slotHeight = gridLayout.cellSize.y;
                 _slotWidth = gridLayout.cellSize.x;
@@ -218,6 +224,27 @@ namespace Tori.UI
                 size.y = _slotHeight;
             }
             content.sizeDelta = size;
+        }
+
+        private void SetSlotPosition(int start)
+        {
+            if (vertical)
+            {
+                SetVerticalSlotPosition(start);
+
+            }
+
+        }
+
+
+        private void SetVerticalSlotPosition(int start)
+        {
+            for (int i = start; i < start + _verticalSlotCount; i++)
+            {
+                var rect = content.GetChild(i).GetComponent<RectTransform>();
+                rect.anchoredPosition = new Vector2(_slotWidth / 2, -_slotHeight / 2 - _slotHeight * (i - start));
+                rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+            }
         }
 
     }

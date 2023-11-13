@@ -25,6 +25,7 @@ namespace Tori.UI
                 for (int j= 0; j < _slotCount; j++)
                 {
                     var slot = Instantiate(_slotPrefab, _contents[i]);
+                    slot.name = $"Slot {i} {j}";
                 }
             }
             _verticalScrollRect.Refresh();
