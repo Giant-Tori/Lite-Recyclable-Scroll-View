@@ -112,6 +112,7 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex + _verticalSlotCount, true);
                 _currentStartIndex++;
 
+                // Set slot position
                 SetSlotPosition(_currentStartIndex);
 
 
@@ -132,6 +133,7 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex - 1, true);
                 _currentStartIndex--;
 
+                // Set slot position
                 SetSlotPosition(_currentStartIndex);
             }
         }
@@ -159,6 +161,8 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex + _horizontalSlotCount, true);
                 _currentStartIndex++;
 
+                // Set slot position
+                SetSlotPosition(_currentStartIndex);
 
             }
             else if (isLeft)
@@ -176,6 +180,8 @@ namespace Tori.UI
                 SetSlotActive(_currentStartIndex - 1, true);
                 _currentStartIndex--;
 
+                // Set slot position
+                SetSlotPosition(_currentStartIndex);
             }
         }
 
@@ -191,16 +197,8 @@ namespace Tori.UI
                 return false;
             }
 
-            if (content.TryGetComponent<GridLayoutGroup>(out var gridLayout))
-            {
-                _slotHeight = gridLayout.cellSize.y;
-                _slotWidth = gridLayout.cellSize.x;
-            }
-            else
-            {
-                _slotHeight = slotRect.rect.height;
-                _slotWidth = slotRect.rect.width;
-            }
+            _slotHeight = slotRect.rect.height;
+            _slotWidth = slotRect.rect.width;
 
             return true;
         }
@@ -233,6 +231,10 @@ namespace Tori.UI
                 SetVerticalSlotPosition(start);
 
             }
+            else
+            {
+                SetHorizontalSlotPosition(start);
+            }
 
         }
 
@@ -243,6 +245,16 @@ namespace Tori.UI
             {
                 var rect = content.GetChild(i).GetComponent<RectTransform>();
                 rect.anchoredPosition = new Vector2(_slotWidth / 2, -_slotHeight / 2 - _slotHeight * (i - start));
+                rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+            }
+        }
+
+        private void SetHorizontalSlotPosition(int start)
+        {
+            for (int i = start; i < start + _horizontalSlotCount; i++)
+            {
+                var rect = content.GetChild(i).GetComponent<RectTransform>();
+                rect.anchoredPosition = new Vector2(_slotWidth / 2 + _slotWidth * (i - start), -_slotHeight / 2);
                 rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
             }
         }
