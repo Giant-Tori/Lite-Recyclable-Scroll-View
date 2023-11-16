@@ -7,6 +7,8 @@ namespace Tori.UI
     {
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GridLayoutGroup _gridLayoutGroup;
+        [SerializeField] private float _verticalPadding;
+        [SerializeField] private float _horizontalPadding;
 
         private Rect _viewportRect;
         private Vector2 _prePosition;
@@ -215,11 +217,13 @@ namespace Tori.UI
             {
                 size.x = _slotWidth;
                 size.y = _slotHeight * _verticalSlotCount;
+                size.y += _verticalPadding * (_verticalSlotCount - 1);
             }
             else
             {
                 size.x = _slotWidth * _horizontalSlotCount;
                 size.y = _slotHeight;
+                size.x += _horizontalPadding * (_horizontalSlotCount - 1);
             }
             content.sizeDelta = size;
         }
@@ -244,7 +248,11 @@ namespace Tori.UI
             for (int i = start; i < start + _verticalSlotCount; i++)
             {
                 var rect = content.GetChild(i).GetComponent<RectTransform>();
-                rect.anchoredPosition = new Vector2(_slotWidth / 2, -_slotHeight / 2 - _slotHeight * (i - start));
+                var posX = _slotWidth / 2;
+                var posY = -_slotHeight / 2 - _slotHeight * (i - start);
+                posY -= _verticalPadding * (i - start);
+
+                rect.anchoredPosition = new Vector2(posX, posY);
                 rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
             }
         }
@@ -254,7 +262,11 @@ namespace Tori.UI
             for (int i = start; i < start + _horizontalSlotCount; i++)
             {
                 var rect = content.GetChild(i).GetComponent<RectTransform>();
-                rect.anchoredPosition = new Vector2(_slotWidth / 2 + _slotWidth * (i - start), -_slotHeight / 2);
+                var posX = _slotWidth / 2 + _slotWidth * (i - start);
+                var posY = -_slotHeight / 2;
+                posX += _horizontalPadding * (i - start);
+
+                rect.anchoredPosition = new Vector2(posX, posY);
                 rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
             }
         }

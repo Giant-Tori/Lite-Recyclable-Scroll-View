@@ -390,6 +390,8 @@ MonoBehaviour:
       m_Calls: []
   _slotPrefab: {fileID: 796270915}
   _gridLayoutGroup: {fileID: 0}
+  _verticalPadding: 5
+  _horizontalPadding: 5
 --- !u!114 &164333416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1179,6 +1181,8 @@ MonoBehaviour:
       m_Calls: []
   _slotPrefab: {fileID: 562552803}
   _gridLayoutGroup: {fileID: 0}
+  _verticalPadding: 5
+  _horizontalPadding: 5
 --- !u!114 &1387362965
 MonoBehaviour:
   m_ObjectHideFlags: 0
