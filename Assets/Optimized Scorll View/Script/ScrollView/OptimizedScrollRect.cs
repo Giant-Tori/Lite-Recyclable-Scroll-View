@@ -7,8 +7,10 @@ namespace Tori.UI
     {
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GridLayoutGroup _gridLayoutGroup;
+
         [SerializeField] private float _verticalPadding;
         [SerializeField] private float _horizontalPadding;
+        [SerializeField] private int _gridCount = 1;
 
         private Rect _viewportRect;
         private Vector2 _prePosition;
@@ -21,8 +23,8 @@ namespace Tori.UI
         private float _epsilon = 0.01f; // for float comparison
         private int _buffer = 2; // buffer for slot count
 
-        private int _verticalSlotCount => Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer;
-        private int _horizontalSlotCount => Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer;
+        private int _verticalSlotCount => (Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer) * _gridCount;
+        private int _horizontalSlotCount => (Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer) * _gridCount;
 
         protected override void OnEnable()
         {
@@ -110,13 +112,19 @@ namespace Tori.UI
                 _prePosition = content.anchoredPosition;
 
                 // Set slot active
-                SetSlotActive(_currentStartIndex, false);
-                SetSlotActive(_currentStartIndex + _verticalSlotCount, true);
-                _currentStartIndex++;
+                for (int i = 0; i < _gridCount; i++)
+                {
+                    SetSlotActive(_currentStartIndex + i, false);
+                    if (_currentStartIndex + _verticalSlotCount + i < _slotCount)
+                    {
+                        SetSlotActive(_currentStartIndex + _verticalSlotCount + i, true);
+                    }
+                }
+
+                _currentStartIndex += _gridCount;
 
                 // Set slot position
                 SetSlotPosition(_currentStartIndex);
-
 
             }
             else if (isUp)
@@ -131,9 +139,13 @@ namespace Tori.UI
                 _prePosition = content.anchoredPosition;
 
                 // Set slot active
-                SetSlotActive(_currentStartIndex + _verticalSlotCount - 1, false);
-                SetSlotActive(_currentStartIndex - 1, true);
-                _currentStartIndex--;
+                for (int i = 0; i < _gridCount; i++)
+                {
+                    SetSlotActive(_currentStartIndex + _verticalSlotCount - 1 - i, false);
+                    SetSlotActive(_currentStartIndex - 1 - i, true);
+                }
+
+                _currentStartIndex -= _gridCount;
 
                 // Set slot position
                 SetSlotPosition(_currentStartIndex);
@@ -159,9 +171,15 @@ namespace Tori.UI
                 _prePosition = content.anchoredPosition;
 
                 // Set slot active
-                SetSlotActive(_currentStartIndex, false);
-                SetSlotActive(_currentStartIndex + _horizontalSlotCount, true);
-                _currentStartIndex++;
+                for (int i = 0; i < _gridCount; i++)
+                {
+                    SetSlotActive(_currentStartIndex + i, false);
+                    if (_currentStartIndex + _horizontalSlotCount + i < _slotCount)
+                    {
+                        SetSlotActive(_currentStartIndex + _horizontalSlotCount + i, true);
+                    }
+                }
+                _currentStartIndex += _gridCount;
 
                 // Set slot position
                 SetSlotPosition(_currentStartIndex);
@@ -178,9 +196,12 @@ namespace Tori.UI
                 _prePosition = content.anchoredPosition;
 
                 // Set slot active
-                SetSlotActive(_currentStartIndex + _horizontalSlotCount - 1, false);
-                SetSlotActive(_currentStartIndex - 1, true);
-                _currentStartIndex--;
+                for (int i = 0; i < _gridCount; i++)
+                {
+                    SetSlotActive(_currentStartIndex + _horizontalSlotCount - 1 - i, false);
+                    SetSlotActive(_currentStartIndex - 1 - i, true);
+                }
+                _currentStartIndex -= _gridCount;
 
                 // Set slot position
                 SetSlotPosition(_currentStartIndex);
@@ -215,14 +236,14 @@ namespace Tori.UI
             var size = content.sizeDelta;
             if (vertical)
             {
-                size.x = _slotWidth;
-                size.y = _slotHeight * _verticalSlotCount;
+                size.x = _slotWidth * _gridCount;
+                size.y = _slotHeight * _verticalSlotCount / _gridCount;
                 size.y += _verticalPadding * (_verticalSlotCount - 1);
             }
             else
             {
-                size.x = _slotWidth * _horizontalSlotCount;
-                size.y = _slotHeight;
+                size.x = _slotWidth * _horizontalSlotCount / _gridCount;
+                size.y = _slotHeight * _gridCount;
                 size.x += _horizontalPadding * (_horizontalSlotCount - 1);
             }
             content.sizeDelta = size;
@@ -245,15 +266,19 @@ namespace Tori.UI
 
         private void SetVerticalSlotPosition(int start)
         {
-            for (int i = start; i < start + _verticalSlotCount; i++)
+            for (int i = start; i < start + _verticalSlotCount / _gridCount; i++)
             {
-                var rect = content.GetChild(i).GetComponent<RectTransform>();
-                var posX = _slotWidth / 2;
-                var posY = -_slotHeight / 2 - _slotHeight * (i - start);
-                posY -= _verticalPadding * (i - start);
+                for (int j = 0; j < _gridCount; j++)
+                {
+                    var index = start + (i - start) * _gridCount + j;
+                    var rect = content.GetChild(index).GetComponent<RectTransform>();
+                    var posX = _slotWidth / 2 + _slotWidth * j;
+                    var posY = -_slotHeight / 2 - _slotHeight * (i - start);
+                    posY -= _verticalPadding * (i - start);
 
-                rect.anchoredPosition = new Vector2(posX, posY);
-                rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+                    rect.anchoredPosition = new Vector2(posX, posY);
+                    rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+                }
             }
         }
 
@@ -261,13 +286,17 @@ namespace Tori.UI
         {
             for (int i = start; i < start + _horizontalSlotCount; i++)
             {
-                var rect = content.GetChild(i).GetComponent<RectTransform>();
-                var posX = _slotWidth / 2 + _slotWidth * (i - start);
-                var posY = -_slotHeight / 2;
-                posX += _horizontalPadding * (i - start);
+                for (int j = 0; j < _gridCount; j++)
+                {
+                    var index = start + (i - start) * _gridCount + j;
+                    var rect = content.GetChild(index).GetComponent<RectTransform>();
+                    var posX = _slotWidth / 2 + _slotWidth * (i - start);
+                    var posY = -_slotHeight / 2 - _slotHeight * j;
+                    posX += _horizontalPadding * (i - start);
 
-                rect.anchoredPosition = new Vector2(posX, posY);
-                rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+                    rect.anchoredPosition = new Vector2(posX, posY);
+                    rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
+                }
             }
         }
 

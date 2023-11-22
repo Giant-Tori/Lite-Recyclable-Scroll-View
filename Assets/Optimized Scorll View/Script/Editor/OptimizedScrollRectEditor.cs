@@ -26,6 +26,8 @@ namespace Tori.UI
         SerializedProperty _slotPrefab;
         SerializedProperty _verticalPadding;
         SerializedProperty _horizontalPadding;
+        SerializedProperty _gridCount;
+        
 
         AnimBool m_ShowElasticity;
         AnimBool m_ShowDecelerationRate;
@@ -51,6 +53,7 @@ namespace Tori.UI
             _slotPrefab = serializedObject.FindProperty("_slotPrefab");
             _verticalPadding = serializedObject.FindProperty("_verticalPadding");
             _horizontalPadding = serializedObject.FindProperty("_horizontalPadding");
+            _gridCount = serializedObject.FindProperty("_gridCount");
 
             m_ShowElasticity = new AnimBool(Repaint);
             m_ShowDecelerationRate = new AnimBool(Repaint);
@@ -111,6 +114,7 @@ namespace Tori.UI
             EditorGUILayout.PropertyField(_slotPrefab);
             EditorGUILayout.PropertyField(_verticalPadding);
             EditorGUILayout.PropertyField(_horizontalPadding);
+            EditorGUILayout.PropertyField(_gridCount);
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(m_MovementType);
