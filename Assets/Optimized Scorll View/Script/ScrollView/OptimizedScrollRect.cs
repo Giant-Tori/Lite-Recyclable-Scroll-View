@@ -21,7 +21,7 @@ namespace Tori.UI
 
         private int _currentStartIndex = 0;
         private float _epsilon = 0.01f; // for float comparison
-        private int _buffer = 2; // buffer for slot count
+        private int _buffer = 6; // buffer for slot count
 
         private int _verticalSlotCount => (Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer) * _gridCount;
         private int _horizontalSlotCount => (Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer) * _gridCount;
@@ -42,7 +42,6 @@ namespace Tori.UI
             }
             else
             {
-
                 onValueChanged.AddListener(OnValueChangedVertical);
             }
 
@@ -158,7 +157,7 @@ namespace Tori.UI
             var diff = current.x - _prePosition.x;
             var isRight = -diff >= _slotWidth - _epsilon;
             var isLeft = diff >= _slotWidth - _epsilon;
-
+            Debug.LogWarning(current);
             if (isRight)
             {
                 var isLast = _currentStartIndex + _horizontalSlotCount >= _slotCount;
