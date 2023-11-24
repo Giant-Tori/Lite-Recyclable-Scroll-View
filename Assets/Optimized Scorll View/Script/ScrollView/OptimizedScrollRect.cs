@@ -64,6 +64,7 @@ namespace Tori.UI
             // Reset Data
             _currentStartIndex = 0;
             _prePosition = new Vector2(0f, 0f);
+            _gridCount = Mathf.Max(1, _gridCount);
 
             // Set Slot Active
             var childCount = content.transform.childCount;
@@ -238,12 +239,14 @@ namespace Tori.UI
                 size.x = _slotWidth * _gridCount;
                 size.y = _slotHeight * _verticalSlotCount / _gridCount;
                 size.y += _verticalPadding * (_verticalSlotCount - 1);
+                size.x += _horizontalPadding * (_gridCount - 1);
             }
             else
             {
                 size.x = _slotWidth * _horizontalSlotCount / _gridCount;
                 size.y = _slotHeight * _gridCount;
                 size.x += _horizontalPadding * (_horizontalSlotCount - 1);
+                size.y += _verticalPadding * (_gridCount - 1);
             }
             content.sizeDelta = size;
         }
@@ -274,6 +277,7 @@ namespace Tori.UI
                     var posX = _slotWidth / 2 + _slotWidth * j;
                     var posY = -_slotHeight / 2 - _slotHeight * (i - start);
                     posY -= _verticalPadding * (i - start);
+                    posX += _horizontalPadding * j;
 
                     rect.anchoredPosition = new Vector2(posX, posY);
                     rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
@@ -292,6 +296,7 @@ namespace Tori.UI
                     var posX = _slotWidth / 2 + _slotWidth * (i - start);
                     var posY = -_slotHeight / 2 - _slotHeight * j;
                     posX += _horizontalPadding * (i - start);
+                    posY -= _verticalPadding * j;
 
                     rect.anchoredPosition = new Vector2(posX, posY);
                     rect.sizeDelta = new Vector2(_slotWidth, _slotHeight);
