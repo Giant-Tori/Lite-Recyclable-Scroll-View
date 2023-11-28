@@ -1,9 +1,15 @@
 # Summary         
-A "simple Optimized Scroll View" for optimizing performance when using scroll views with large slots.<br/><br/>
+A "simple Optimized Scroll View" for optimizing performance with simple change when using scroll views with large slots.<br/><br/>
 "Simple Optimized Scroll View" is made for implementing only the essential parts as simple as possible so that they could be applied to a variety of projects.<br/>
 This tool is designed to enable only the slots to be shown on the Viewport so that even a large amount of slots can be seen without significantly affecting performance.
 
+# Recommend For
+- Who want simply replace scroll view and grid layout group for improving performance
+- Who want easily modify code for own project
+- If you have huge amount of slots in a scroll view and have many problems in performance, consider recyclable scroll view.
+
 # Performance
+There is more information of test result in "PerformanceTest.md"
 ### 1. Basic Scroll View
 ![image](https://github.com/Giant-Tori/Simple-Optimized-Scroll-View/assets/149294349/359cab04-48c7-49d3-872a-6fecaae41a1d)
 
