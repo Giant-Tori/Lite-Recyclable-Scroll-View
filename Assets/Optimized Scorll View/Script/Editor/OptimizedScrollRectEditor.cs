@@ -67,8 +67,6 @@ namespace Tori.UI
             {
                 _isHorizontal = false;
             }
-
-
         }
 
         protected virtual void OnDisable()

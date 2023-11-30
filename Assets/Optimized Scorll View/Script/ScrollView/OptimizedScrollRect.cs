@@ -1,5 +1,5 @@
-using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Tori.UI
 {
@@ -7,7 +7,7 @@ namespace Tori.UI
     {
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GridLayoutGroup _gridLayoutGroup;
-
+        [Header("Setting")]
         [SerializeField] private float _verticalPadding;
         [SerializeField] private float _horizontalPadding;
         [SerializeField] private int _gridCount = 1;
@@ -18,23 +18,25 @@ namespace Tori.UI
         private int _slotCount;
         private float _slotHeight;
         private float _slotWidth;
-
         private int _currentStartIndex = 0;
-        private float _epsilon = 0.01f; // for float comparison
-        private int _buffer = 6; // buffer for slot count
+
+        private readonly float _epsilon = 0.01f; // for float comparison
+        private readonly int _buffer = 6; // slot buffer
 
         private int _verticalSlotCount => (Mathf.CeilToInt(_viewportRect.height / _slotHeight) + _buffer) * _gridCount;
         private int _horizontalSlotCount => (Mathf.CeilToInt(_viewportRect.width / _slotWidth) + _buffer) * _gridCount;
-
+        protected override void Awake()
+        {
+            _viewportRect = viewport.rect;
+        }
         protected override void OnEnable()
         {
+            base.OnEnable();
+
             if (Application.isPlaying == false)
             {
                 return;
             }
-
-            base.OnEnable();
-            _viewportRect = viewport.rect;
 
             if (horizontal)
             {
@@ -66,28 +68,8 @@ namespace Tori.UI
             _prePosition = new Vector2(0f, 0f);
             _gridCount = Mathf.Max(1, _gridCount);
 
-            // Set Slot Active
-            var childCount = content.transform.childCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                if (vertical && i < _verticalSlotCount)
-                {
-                    content.GetChild(i).gameObject.SetActive(true);
-
-                }
-                else if (horizontal && i < _horizontalSlotCount)
-                {
-                    content.GetChild(i).gameObject.SetActive(true);
-                }
-                else
-                {
-                    content.GetChild(i).gameObject.SetActive(false);
-                }
-            }
-
+            SetSlotsActive();
             SetSlotPosition(_currentStartIndex);
-
-
         }
 
         private void OnValueChangedVertical(Vector2 normalizedPosition)
@@ -100,7 +82,6 @@ namespace Tori.UI
 
             if (isDown)
             {
-
                 var isLast = _currentStartIndex + _verticalSlotCount >= _slotCount;
                 if (isLast)
                 {
@@ -152,13 +133,14 @@ namespace Tori.UI
             }
         }
 
+
         private void OnValueChangedHorizontal(Vector2 normalizedPosition)
         {
             var current = content.anchoredPosition;
             var diff = current.x - _prePosition.x;
             var isRight = -diff >= _slotWidth - _epsilon;
             var isLeft = diff >= _slotWidth - _epsilon;
-            Debug.LogWarning(current);
+
             if (isRight)
             {
                 var isLast = _currentStartIndex + _horizontalSlotCount >= _slotCount;
@@ -231,6 +213,26 @@ namespace Tori.UI
             content.GetChild(index).gameObject.SetActive(isActive);
         }
 
+        private void SetSlotsActive()
+        {
+            var childCount = content.transform.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                if (vertical && i < _verticalSlotCount)
+                {
+                    content.GetChild(i).gameObject.SetActive(true);
+
+                }
+                else if (horizontal && i < _horizontalSlotCount)
+                {
+                    content.GetChild(i).gameObject.SetActive(true);
+                }
+                else
+                {
+                    content.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+        }
         private void SetContentSIze()
         {
             var size = content.sizeDelta;
@@ -276,6 +278,8 @@ namespace Tori.UI
                     var rect = content.GetChild(index).GetComponent<RectTransform>();
                     var posX = _slotWidth / 2 + _slotWidth * j;
                     var posY = -_slotHeight / 2 - _slotHeight * (i - start);
+
+                    // Set padding
                     posY -= _verticalPadding * (i - start);
                     posX += _horizontalPadding * j;
 
@@ -295,6 +299,8 @@ namespace Tori.UI
                     var rect = content.GetChild(index).GetComponent<RectTransform>();
                     var posX = _slotWidth / 2 + _slotWidth * (i - start);
                     var posY = -_slotHeight / 2 - _slotHeight * j;
+
+                    // Set padding
                     posX += _horizontalPadding * (i - start);
                     posY -= _verticalPadding * j;
 
